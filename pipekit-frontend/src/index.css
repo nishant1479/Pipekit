@@ -27,3 +27,29 @@ body {
 }
 
 .mono { font-family: 'IBM Plex Mono', monospace; }  
+.react-flow__controls {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: none;
+}
+
+.react-flow__controls-button {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+  fill: var(--text);
+}
+
+.react-flow__controls-button:hover {
+  background: var(--accent-dim);
+}
+
+
+.react-flow__edge-path {
+  stroke: var(--accent) !important;
+  stroke-width: 1.5px !important;
+}
+
+.react-flow__connection-path {
+  stroke: var(--accent) !important;
+}

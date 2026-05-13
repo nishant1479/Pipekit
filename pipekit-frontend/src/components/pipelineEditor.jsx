@@ -18,24 +18,21 @@ export default function PipelineEditor() {
 
   const [nodes, setNodes, onNodesChange] = useNodesState([])
   const [edges, setEdges, onEdgesChange] = useEdgesState([])
-  const [selectedNode, setSelectedNode] = useState(null)
+const [selectedNodeId, setSelectedNodeId] = useState(null)
+const selectedNode = nodes.find(n => n.id === selectedNodeId) ?? null
   const [pipelineName, setPipelineName] = useState('Untitled Pipeline')
 
-  useEffect(() => {
-    if (isNew) return
-
-    const loadPipeline = async () => {
-      const pipeline = await getPipeline(id)
-      if (!pipeline) return
-
-      setPipelineName(pipeline.name || 'Untitled Pipeline')
-      setNodes(pipeline.nodes || [])
-      setEdges(pipeline.edges || [])
-      setSelectedNode(null)
-    }
-
-    loadPipeline()
-  }, [id, isNew, setNodes, setEdges])
+ useEffect(() => {
+  if (!isNew) {
+    getPipeline(id).then(pipeline => {
+      if (pipeline) {
+        setPipelineName(pipeline.name)
+        setNodes(pipeline.nodes)
+        setEdges(pipeline.edges)
+      }
+    })
+  }
+}, [id])
 
   // When user draws an edge between two nodes
   const onConnect = useCallback(
@@ -44,30 +41,31 @@ export default function PipelineEditor() {
   )
 
   // When user clicks a node — set it as selected
-  const onNodeClick = useCallback((_, node) => {
-    setSelectedNode(node)
-  }, [])
+const onNodeClick = useCallback((_, node) => {
+  console.log('clicked node:', node)  // add this
+  setSelectedNodeId(node.id)
+}, [])
 
   // When sidebar form changes — update that node's data
   const onNodeDataChange = useCallback((nodeId, newData) => {
-    setNodes(nds => nds.map(n =>
-      n.id === nodeId ? { ...n, data: newData } : n
-    ))
-    // Also update selectedNode so the sidebar stays in sync
-    setSelectedNode(prev => prev?.id === nodeId ? { ...prev, data: newData } : prev)
-  }, [setNodes])
+  setNodes(nds => nds.map(n =>
+    n.id === nodeId ? { ...n, data: newData } : n
+  ))
+}, [setNodes])
 
   // Add a new step node to the canvas
   const addStepNode = () => {
-    const newNode = {
-      id: Date.now().toString(),
-      type: 'step',
-      position: { x: 200 + Math.random() * 100, y: 200 + Math.random() * 100 },
-      data: { name: 'New Step', image: '', command: '' },
-    }
-    setNodes(nds => [...nds, newNode])
+  const newNode = {
+    id: Date.now().toString(),
+    type: 'step',
+    position: { 
+      x: 100 + (nodes.length % 3) * 220,   // spread horizontally
+      y: 100 + Math.floor(nodes.length / 3) * 160  // new row every 3
+    },
+    data: { name: 'New Step', image: '', command: '' },
   }
-
+  setNodes(nds => [...nds, newNode])
+}
   // Save pipeline
   const handleSave = async () => {
     const payload = { name: pipelineName, nodes, edges }
@@ -117,15 +115,20 @@ export default function PipelineEditor() {
         {/* Canvas */}
         <div style={{ flex: 1 }}>
           <ReactFlow
-            nodes={nodes}
-            edges={edges}
-            onNodesChange={onNodesChange}
-            onEdgesChange={onEdgesChange}
-            onConnect={onConnect}
-            onNodeClick={onNodeClick}
-            nodeTypes={nodeTypes}
-            fitView
-          >
+  nodes={nodes}
+  onNodesChange={onNodesChange}
+  edges={edges}
+  onEdgesChange={onEdgesChange}
+  onConnect={onConnect}
+  onNodeClick={onNodeClick}
+  nodeTypes={nodeTypes}
+  isValidConnection={(connection) => 
+      connection.source !== connection.target
+    }
+  connectionLineType="smoothstep"
+  defaultEdgeOptions={{ type: 'smoothstep', style: { stroke: 'var(--accent)', strokeWidth: 1.5 } }}
+  fitView
+  >
             <Background color="var(--border)" gap={24} />
             <Controls />
           </ReactFlow>

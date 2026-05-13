@@ -1,24 +1,40 @@
-// Mock data — replace these functions with real axios calls later
-// without changing anything else in the app
+// In-memory store — simulates a real database for now
+// When you connect the real backend, only this file changes
 
-const mockPipelines = [
-  {
+const store = {
+  "1": {
     id: "1",
     name: "Node CI",
     updatedAt: "2024-01-15T10:30:00Z",
-    nodes: [{ id: "1" }, { id: "2" }, { id: "3" }],
-    edges: [{ source: "1", target: "2" }, { source: "2", target: "3" }],
+    nodes: [],
+    edges: [],
   },
-  {
-    id: "2", 
+  "2": {
+    id: "2",
     name: "Docker Build",
     updatedAt: "2024-01-14T08:00:00Z",
-    nodes: [{ id: "1" }, { id: "2" }],
-    edges: [{ source: "1", target: "2" }],
+    nodes: [],
+    edges: [],
   },
-];
+}
 
-export const getPipelines = async () => mockPipelines;
-export const getPipeline  = async (id) => mockPipelines.find(p => p.id === id);
-export const createPipeline = async (data) => ({ ...data, id: Date.now().toString() });
-export const updatePipeline = async (id, data) => ({ ...data, id });
+export const getPipelines = async () => Object.values(store)
+
+export const getPipeline = async (id) => store[id] ?? null
+
+export const createPipeline = async (data) => {
+  const id = Date.now().toString()
+  const pipeline = { ...data, id, updatedAt: new Date().toISOString() }
+  store[id] = pipeline
+  return pipeline
+}
+
+export const updatePipeline = async (id, data) => {
+  const pipeline = { ...data, id, updatedAt: new Date().toISOString() }
+  store[id] = pipeline
+  return pipeline
+}
+
+export const deletePipeline = async (id) => {
+  delete store[id]
+}
