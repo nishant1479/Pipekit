@@ -38,3 +38,7 @@ export const updatePipeline = async (id, data) => {
 export const deletePipeline = async (id) => {
   delete store[id]
 }
+export const createRun = async (pipelineId) => {
+  const runId = Date.now().toString()
+  return { id: runId, pipelineId, status: 'queued' }
+}

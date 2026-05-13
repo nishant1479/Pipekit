@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { ReactFlow, useNodesState, useEdgesState, addEdge, Background, Controls } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
+import { createRun } from '../api/pipelines'
 
 import StepNode from './nodes/stepNode'
 import Sidebar from './sidebar'
@@ -106,6 +107,17 @@ const onNodeClick = useCallback((_, node) => {
             padding: '6px 14px', fontFamily: 'Syne',
             fontWeight: 700, fontSize: '12px', cursor: 'pointer'
           }}>SAVE</button>
+          <button onClick={async () => {
+  await handleSave()
+  const run = await createRun(id)
+  navigate(`/runs/${id}/${run.id}`)
+}} style={{
+  background: 'transparent',
+  border: '1px solid var(--success)',
+  color: 'var(--success)',
+  padding: '6px 14px',
+  fontFamily: 'Syne', fontWeight: 700, fontSize: '12px', cursor: 'pointer'
+}}>▶ RUN</button>
         </div>
       </div>
 
