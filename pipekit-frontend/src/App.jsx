@@ -7,10 +7,10 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/"                   element={<Dashboard />} />
-        <Route path="/pipeline/:id"       element={<PipelineEditor />} />
-        <Route path="/pipeline/new"       element={<PipelineEditor />} />
-        <Route path="/runs/:id"           element={<RunView />} />
+        <Route path="/"                          element={<Dashboard />} />
+        <Route path="/pipeline/new"              element={<PipelineEditor />} />
+        <Route path="/pipeline/:id"              element={<PipelineEditor />} />
+        <Route path="/runs/:pipelineId/:runId"   element={<RunView />} />
       </Routes>
     </BrowserRouter>
   )
